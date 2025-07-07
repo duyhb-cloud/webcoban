@@ -1,0 +1,17 @@
+{
+ "name": "invencamp",
+ "version": "1.0.0",
+ "main": "server.js",
+ "scripts": {
+  "start": "node server.js"
+ },
+ "dependencies": {
+  "@payos/node": "^1.0.10",
+  "axios": "^1.10.0",
+  "body-parser": "^2.2.0",
+  "cors": "^2.8.5",
+  "dotenv": "^17.0.1",
+  "ejs": "^3.1.10",
+  "express": "^5.1.0"
+ }
+}
