@@ -6,10 +6,15 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <nav class="navbar navbar-expand-lg navbar-light bg-primary">
-      <img src="IoT.png" class="logo" alt="Logo">
+      <img src="icon.png" class="logo" alt="Logo">
     <span style="font-size: 24px; font-weight: bold;">Nhóm 1_HL_IOT01</span>
 </nav>
+<style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        button { padding: 10px 20px; font-size: 16px; margin: 10px; }
+    </style>
 <link rel="stylesheet" href="/css/style.css">
+
 </head>
 <body>
 
@@ -18,28 +23,30 @@
       <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
         <div class="card h-100">
           <img src="/temp.png" class="card-img-top" alt="Nhietdo">
-            <h3 class="card-text">Nhiệt độ:<a>60</a>°C</h3>
+            <div id="sensor-value">
+              <h3 class="card-text">Nhiệt độ: <span id="temp"><%= sensorData.temp %></span>°C</h3>
+            </div>
         </div>
       </div>
 
       <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
         <div class="card h-100">
           <img src="/humid.png" class="card-img-top" alt="do am">
-            <h3 class="card-text">Độ ẩm:<a>20</a>%</h3>
+            <h3 class="card-text">Độ ẩm: <span id="humi"><%= sensorData.humi %></span>%</h3>
         </div>
       </div>
 
       <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
         <div class="card h-100">
           <img src="/pressure.png" class="card-img-top" alt="Áp suất ">
-            <h3 class="card-text">Áp suất:<a>20</a>Pa</h3>
+            <h3 class="card-text">Áp suất: <span id="light"><%= sensorData.light %></span>Pa</h3>
         </div>
       </div>
 
       <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
         <div class="card h-100">
           <img src="/doamdat.png" class="card-img-top" alt="do am dat">
-            <h3 class="card-text">Độ ẩm đất:<a>40</a>%</h3>
+            <h3 class="card-text">Độ ẩm đất: <span id="gas"><%= sensorData.gas %></span>%</h3>
         </div>
       </div>
 
@@ -48,16 +55,14 @@
       <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
         <div class="card h-100">
           <img src="/control.png" class="card-img-top" alt="điều khiển">
-            <h3 class="card-text">Lệnh 1</h3>
-           <button class="btn btn-primary">Điều khiển</button>
-           <a>Truyền xuống raspi</a>
+            <!-- Nút điều khiển motor -->
+    <button onclick="controlMotor('MOTOR_ON')" class="btn btn-primary">Bật Motor</button>
+    <button onclick="controlMotor('MOTOR_OFF')" class="btn btn-primary">Tắt Motor</button>
         </div>
       </div>
-
-
-
-      
     </div>
+<!-- JavaScript real-time -->
+    <script src="/script.js"></script>
 
 </body>
 </html>
