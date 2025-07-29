@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Trang chủ</title>
   <link rel="icon" href="/icon.png" type="image/png">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <nav class="navbar navbar-expand-lg navbar-light bg-primary">
-      <img src="icon.png" class="logo" alt="Logo">
+      <img src="logo2_new.png" class="logo" alt="Logo">
     <span style="font-size: 24px; font-weight: bold;">Nhóm 1_HL_IOT01</span>
 </nav>
 <style>
@@ -35,34 +38,67 @@
             <h3 class="card-text">Độ ẩm: <span id="humi"><%= sensorData.humi %></span>%</h3>
         </div>
       </div>
-
+      
       <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
-        <div class="card h-100">
-          <img src="/pressure.png" class="card-img-top" alt="Áp suất ">
-            <h3 class="card-text">Áp suất: <span id="light"><%= sensorData.light %></span>Pa</h3>
+    <div class="card h-100">
+        <img src="/plant.png" class="card-img-top" alt="Trạng thái cây">
+        <div class="card-body">
+            <h3 class="card-text">Dự đoán:      <span id="plant-health" class="healthy">Đang kiểm tra...</span></h3>
+            <p id="health-desc" class="card-text"></p>
         </div>
-      </div>
+    </div>
+</div>
+      <div class="col-6 mb-4">
+  
+    <canvas id="sensorChart"></canvas>
+    <h3 class="card-text">Vẽ đồ thị <span id="humi"></span></h3>
+  
+</div>
 
-      <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
-        <div class="card h-100">
-          <img src="/doamdat.png" class="card-img-top" alt="do am dat">
-            <h3 class="card-text">Độ ẩm đất: <span id="gas"><%= sensorData.gas %></span>%</h3>
-        </div>
-      </div>
-
-
-      <h2 class="mb-4">Điều khiển</h2>
-      <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 mb-4">
-        <div class="card h-100">
-          <img src="/control.png" class="card-img-top" alt="điều khiển">
-            <!-- Nút điều khiển motor -->
-    <button onclick="controlMotor('MOTOR_ON')" class="btn btn-primary">Bật Motor</button>
-    <button onclick="controlMotor('MOTOR_OFF')" class="btn btn-primary">Tắt Motor</button>
-        </div>
-      </div>
+      
     </div>
 <!-- JavaScript real-time -->
     <script src="/script.js"></script>
+    <script>
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          { label: 'Nhiệt độ (°C)', data: [], borderColor: 'red', fill: false },
+          { label: 'Độ ẩm (%)', data: [], borderColor: 'blue', fill: false },
+          { label: 'Ánh sáng', data: [], borderColor: 'orange', fill: false },
+          { label: 'Gas (ppm)', data: [], borderColor: 'green', fill: false }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { display: true },
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    const socket = io();
+    socket.on('sensorUpdate', (data) => {
+      const time = new Date().toLocaleTimeString();
+
+      chart.data.labels.push(time);
+      chart.data.datasets[0].data.push(data.temp);
+      chart.data.datasets[1].data.push(data.humi);
+      chart.data.datasets[2].data.push(data.light);
+      chart.data.datasets[3].data.push(data.gas);
+
+      if (chart.data.labels.length > 15) { // giữ 15 điểm gần nhất
+        chart.data.labels.shift();
+        chart.data.datasets.forEach(ds => ds.data.shift());
+      }
+
+      chart.update();
+    });
+  </script>
 
 </body>
 </html>

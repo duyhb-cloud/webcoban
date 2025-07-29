@@ -1,16 +1,33 @@
+// Thêm hàm này để cập nhật trạng thái cây
+function updatePlantHealth() {
+    fetch('/plant-health')
+        .then(response => response.json())
+        .then(data => {
+            const healthElement = document.getElementById("plant-health");
+            healthElement.textContent = data.status;
+            healthElement.className = data.healthy ? "healthy" : "unhealthy";
+            
+            const descElement = document.getElementById("health-desc");
+            descElement.textContent = data.description;
+        });
+}
+
+// Sửa hàm fetchData để gọi cả updatePlantHealth
 function fetchData() {
     fetch('/update-data')
         .then(response => response.json())
         .then(data => {
+            // Cập nhật giá trị cảm biến
             document.getElementById("temp").textContent = data.temp;
             document.getElementById("humi").textContent = data.humi;
-            document.getElementById("light").textContent = data.light;
-            document.getElementById("gas").textContent = data.gas;
+
+            
+            // Cập nhật trạng thái cây
+            updatePlantHealth();
         })
         .catch(err => console.error("Lỗi:", err))
-        .finally(() => setTimeout(fetchData, 2000)); // Cập nhật mỗi 2 giây
+        .finally(() => setTimeout(fetchData, 2000));
 }
-
 // Khởi chạy khi trang load
 document.addEventListener('DOMContentLoaded', fetchData);
 

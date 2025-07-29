@@ -1,8 +1,12 @@
 const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
 
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,18 +18,54 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 let sensorData = {
-    temp: 0,
-    humi: 0,
-    light: 0,
-    gas: 0
+    temp:0,
+    humi:0,
+    light:0,
+    gas:0
 };
+setInterval(() => {
+    console.log("📊 Gửi dữ liệu:", sensorData); // <--- debug
+    io.emit('sensorUpdate', sensorData);
+}, 2000);
 
+// Thêm hàm phân tích bệnh cây
+function analyzePlantHealth(sensorData) {
+    // Logic phân tích dựa trên ngưỡng
+    const { temp, humi, light, gas } = sensorData;
+    
+    let issues = [];
+    
+    // Ngưỡng cho cây thông thường
+    if (temp > 30) issues.push("nhiệt độ cao");
+    if (temp < 15) issues.push("nhiệt độ thấp");
+    if (humi > 80) issues.push("độ ẩm cao");
+    if (humi < 40) issues.push("độ ẩm thấp");
+
+
+    if (issues.length === 0) {
+        return {
+            status: "KHỎE MẠNH",
+            description: "Cây phát triển tốt",
+            healthy: true
+        };
+    } else {
+        return {
+            status: "CÓ VẤN ĐỀ",
+            description: `Phát hiện: ${issues.join(", ")}`,
+            healthy: false
+        };
+    }
+}
 
 // Trang chính
 app.get('/', (req, res) => {
   res.render('index', { sensorData }); // render views/index.ejs
 });
-
+// Thêm endpoint mới
+app.get('/plant-health', (req, res) => {
+    const analysis = analyzePlantHealth(sensorData);
+    res.json(analysis);
+});
 // Endpoint để client (trình duyệt) lấy dữ liệu
 app.get('/update-data', (req, res) => {
     res.json(sensorData);
@@ -50,9 +90,15 @@ app.post('/control-motor', async (req, res) => {
     }
 });
 
-app.listen(3000, '0.0.0.0', () => {
+io.on('connection', (socket) => {
+    console.log('Client connected');
+    socket.emit('sensorUpdate', sensorData); // gửi dữ liệu ngay khi client kết nối
+});
+
+server.listen(3000, '0.0.0.0', () => {
   console.log('Server listening on port 3000');
 });
+
 
 
 
